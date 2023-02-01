@@ -1,0 +1,5 @@
+name: KazeDice
+version: 0.0.1
+authors: ["AnoKaze"]
+api-version: 0.48.0
+main: anokaze.kazedice.KazeDicePlugin
