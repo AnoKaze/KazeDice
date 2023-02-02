@@ -1,5 +1,6 @@
 package anokaze.kazedice.command;
 
+import anokaze.kazedice.entity.BotException;
 import anokaze.kazedice.entity.DiceExpression;
 import anokaze.kazedice.util.DiceUtil;
 import snw.jkook.command.UserCommandExecutor;
@@ -13,14 +14,17 @@ public class RollCommand implements UserCommandExecutor {
 
     @Override
     public void onCommand(User user, Object[] arguments, Message message) {
-        String origin = (String) arguments[0];
-        DiceExpression diceExpression = DiceUtil.diceExpressionParser(origin);
-
-        if(diceExpression == null){
-            message.reply("表达式输入格式不正确，请检查后重新输入！");
+        if(message == null){
             return;
         }
-        message.reply(":game_die:掷骰结果：" + diceExpression);
+
+        String origin = (String) arguments[0];
+        try {
+            DiceExpression diceExpression = DiceUtil.diceExpressionParser(origin);
+            message.reply(":game_die:掷骰结果：" + diceExpression);
+        } catch (BotException e){
+            message.reply(":x:参数`" + e.getData() + "`输入错误，请重新输入！");
+        }
     }
 
 }

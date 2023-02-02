@@ -1,14 +1,21 @@
 package anokaze.kazedice.util;
 
+import anokaze.kazedice.constants.BotExceptions;
 import anokaze.kazedice.constants.Patterns;
+import anokaze.kazedice.entity.BotException;
 import anokaze.kazedice.entity.DiceGroup;
 import anokaze.kazedice.entity.DiceExpression;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
+/**
+ * @author AnoKaze
+ */
+@Slf4j
 public class DiceUtil {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
@@ -42,7 +49,7 @@ public class DiceUtil {
     }
 
     /***
-     * 根据字符串获取骰子表达式对象
+     * 根据字符串获取骰子组对象
      * @param diceGroup 骰子组的字符串形式
      * @return 骰子表达式对象
      */
@@ -50,36 +57,39 @@ public class DiceUtil {
         Matcher matcher;
         matcher = Patterns.nxxDicePattern.matcher(diceGroup);
         if(matcher.find()){
-            Integer n = Integer.parseInt(matcher.group(1));
+            int n = Integer.parseInt(matcher.group(1));
             return new DiceGroup(n, null, null);
         }
         matcher = Patterns.ndxDicePattern.matcher(diceGroup);
         if(matcher.find()){
-            Integer n = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
-            Integer d = Integer.parseInt(matcher.group(2));
+            int n = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
+            int d = Integer.parseInt(matcher.group(2));
             return new DiceGroup(n,d,null);
         }
         matcher = Patterns.ndkDicePattern.matcher(diceGroup);
         if(matcher.find()){
-            Integer n = Integer.parseInt(matcher.group(1));
-            Integer d = Integer.parseInt(matcher.group(2));
-            Integer k = Integer.parseInt(matcher.group(3));
-            if(n < k){
-                return null;
+            int n = Integer.parseInt(matcher.group(1));
+            int d = Integer.parseInt(matcher.group(2));
+            int k = Integer.parseInt(matcher.group(3));
+            if(Math.abs(n) < k){
+                throw new BotException(BotExceptions.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
             }
             return new DiceGroup(n,d,k);
         }
-
-        return null;
+        throw new BotException(BotExceptions.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
     }
 
+    /***
+     * 根据字符串获取骰子表达式对象
+     * @param expression 骰子表达式的字符串形式
+     * @return 骰子表达式
+     */
     public static DiceExpression diceExpressionParser(String expression){
         List<String> operators = getOperators(expression);
         String[] diceGroupStr = expression.split(String.valueOf(Patterns.operatorPattern));
         List<DiceGroup> diceGroups = new ArrayList<>();
         for(String item: diceGroupStr){
             DiceGroup newGroup = diceGroupParser(item);
-            if(newGroup == null) { return null; }
             diceGroups.add(newGroup);
         }
         return new DiceExpression(operators, diceGroups);
