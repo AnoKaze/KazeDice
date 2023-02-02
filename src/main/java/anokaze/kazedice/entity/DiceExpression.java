@@ -7,13 +7,11 @@ import java.util.List;
 
 @Getter
 public class DiceExpression {
-    private final String origin;
     private final List<String> operators;
     private final List<DiceGroup> diceGroups;
     private final Integer value;
 
-    public DiceExpression(String origin, List<String> operators, List<DiceGroup> diceGroups){
-        this.origin = origin;
+    public DiceExpression(List<String> operators, List<DiceGroup> diceGroups){
         this.operators = operators;
         this.diceGroups = diceGroups;
         this.value = initValue();
@@ -21,12 +19,19 @@ public class DiceExpression {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(origin);
+        StringBuilder result = new StringBuilder();
+        for(int i =  0; i < diceGroups.size(); i++){
+            if(i != 0){
+                result.append(operators.get(i-1));
+            }
+            result.append(diceGroups.get(i).getExpression());
+        }
+
         for(int i = 0; i < diceGroups.size(); i++){
             if(i == 0){
-                result.append("=").append(diceGroups.get(i));
+                result.append("=").append(diceGroups.get(i).getFormula());
             } else {
-                result.append(operators.get(i-1)).append(diceGroups.get(i));
+                result.append(operators.get(i-1)).append(diceGroups.get(i).getFormula());
             }
         }
         if(diceGroups.size() > 1){
@@ -44,7 +49,7 @@ public class DiceExpression {
             Integer operand2 = diceGroups.get(i+1).getValue();
             String operator = operators.get(i);
 
-            if(operator.equals("*") || operator.equals("/")){
+            if("*".equals(operator) || "/".equals(operator)){
                 int index = numberCache.size() - 1;
                 Integer operand1 = numberCache.get(index);
                 numberCache.set(index, operate(operand1, operand2, operators.get(i)));
@@ -74,7 +79,8 @@ public class DiceExpression {
                 return operand1 * operand2;
             case "/":
                 return operand1 / operand2;
+            default:
+                return operand1;
         }
-        return operand1;
     }
 }

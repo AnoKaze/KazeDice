@@ -1,10 +1,12 @@
 package anokaze.kazedice;
 
 import anokaze.kazedice.command.RollCommand;
-import anokaze.kazedice.util.MybatisUtil;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.plugin.BasePlugin;
 
+/**
+ * @author AnoKaze
+ */
 public class KazeDicePlugin extends BasePlugin {
     private static KazeDicePlugin instance;
 

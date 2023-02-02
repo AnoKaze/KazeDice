@@ -10,15 +10,35 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 public class DiceUtil {
-    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /***
      * 投出一枚指定面数的骰子
-     * @param sides 骰子面数
-     * @return 骰子结果
+     * @param faces 骰子面数
+     * @return 投出结果
      */
-    public static Integer rollDice(int sides) {
-        return secureRandom.nextInt(sides) + 1;
+    public static Integer rollDie(int faces){
+        if(faces < 0) {
+            return null;
+        } else if(faces == 0) {
+            return 0;
+        } else {
+            return SECURE_RANDOM.nextInt(faces) + 1;
+        }
+    }
+
+    /***
+     * 投出若干枚指定面数的骰子
+     * @param number 骰子个数
+     * @param faces 骰子面数
+     * @return 投出结果
+     */
+    public static List<Integer> rollDice(int number, int faces){
+        List<Integer> result = new ArrayList<>();
+        for(int i = 0; i < number; i++){
+            result.add(rollDie(faces));
+        }
+        return result;
     }
 
     /***
@@ -26,35 +46,43 @@ public class DiceUtil {
      * @param diceGroup 骰子组的字符串形式
      * @return 骰子表达式对象
      */
-    public static DiceGroup DiceGroupParser(String diceGroup){
-        Matcher matcher = Patterns.dicePattern.matcher(diceGroup);
+    public static DiceGroup diceGroupParser(String diceGroup){
+        Matcher matcher;
+        matcher = Patterns.nxxDicePattern.matcher(diceGroup);
         if(matcher.find()){
-            int total = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
-            int sides = matcher.group(2) == null ? -1 : Integer.parseInt(matcher.group(2));
-            if(sides == -1 || sides == 0) {
-                return new DiceGroup(total, sides, null);
-            }
-            else {
-                List<Integer> points = new ArrayList<>(total);
-                for(int i = 0; i < total; i++){
-                    points.add(DiceUtil.rollDice(sides));
-                }
-                return new DiceGroup(total, sides, points);
-            }
+            Integer n = Integer.parseInt(matcher.group(1));
+            return new DiceGroup(n, null, null);
         }
+        matcher = Patterns.ndxDicePattern.matcher(diceGroup);
+        if(matcher.find()){
+            Integer n = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
+            Integer d = Integer.parseInt(matcher.group(2));
+            return new DiceGroup(n,d,null);
+        }
+        matcher = Patterns.ndkDicePattern.matcher(diceGroup);
+        if(matcher.find()){
+            Integer n = Integer.parseInt(matcher.group(1));
+            Integer d = Integer.parseInt(matcher.group(2));
+            Integer k = Integer.parseInt(matcher.group(3));
+            if(n < k){
+                return null;
+            }
+            return new DiceGroup(n,d,k);
+        }
+
         return null;
     }
 
-    public static DiceExpression DiceExpressionParser(String expression){
+    public static DiceExpression diceExpressionParser(String expression){
         List<String> operators = getOperators(expression);
         String[] diceGroupStr = expression.split(String.valueOf(Patterns.operatorPattern));
         List<DiceGroup> diceGroups = new ArrayList<>();
         for(String item: diceGroupStr){
-            DiceGroup newGroup = DiceGroupParser(item);
+            DiceGroup newGroup = diceGroupParser(item);
             if(newGroup == null) { return null; }
             diceGroups.add(newGroup);
         }
-        return new DiceExpression(expression, operators, diceGroups);
+        return new DiceExpression(operators, diceGroups);
     }
 
     private static List<String> getOperators(String expression){

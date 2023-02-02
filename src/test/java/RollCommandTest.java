@@ -3,8 +3,8 @@ import anokaze.kazedice.util.DiceUtil;
 
 public class RollCommandTest {
     public static void main(String[] args) {
-        String diceString = "50-2d6*5+4d4/2";
-        DiceExpression diceExpression = DiceUtil.DiceExpressionParser(diceString);
+        String diceString = "3d6k2+-2d10k1+3d6/2*3";
+        DiceExpression diceExpression = DiceUtil.diceExpressionParser(diceString);
 
         if(diceExpression == null){
             System.out.println("格式错误！");
