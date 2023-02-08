@@ -1,6 +1,6 @@
 package anokaze.kazedice.command;
 
-import anokaze.kazedice.entity.BotException;
+import anokaze.kazedice.exception.BotException;
 import anokaze.kazedice.entity.DiceExpression;
 import anokaze.kazedice.util.DiceUtil;
 import snw.jkook.command.UserCommandExecutor;

@@ -2,7 +2,7 @@ package anokaze.kazedice.util;
 
 import anokaze.kazedice.constants.BotExceptions;
 import anokaze.kazedice.constants.Patterns;
-import anokaze.kazedice.entity.BotException;
+import anokaze.kazedice.exception.BotException;
 import anokaze.kazedice.entity.DiceGroup;
 import anokaze.kazedice.entity.DiceExpression;
 import lombok.extern.slf4j.Slf4j;

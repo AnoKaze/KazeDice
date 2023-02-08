@@ -1,4 +1,4 @@
-package anokaze.kazedice.entity;
+package anokaze.kazedice.exception;
 
 import anokaze.kazedice.constants.BotExceptions;
 
