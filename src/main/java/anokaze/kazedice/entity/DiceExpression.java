@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 完整的掷骰表达式
  * @author AnoKaze
- * @date 2023/02/02
+ * @since 2023/02/02
  */
 @Getter
 public class DiceExpression {

@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * 可控报错的种类
  * @author AnoKaze
- * @date 2023/2/2
+ * @since 2023/02/02
  */
 @Getter
 public enum BotExceptions {

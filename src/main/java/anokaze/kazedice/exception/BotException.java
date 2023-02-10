@@ -5,7 +5,7 @@ import anokaze.kazedice.constants.BotExceptions;
 /**
  * Bot在运行中产生的可控报错
  * @author AnoKaze
- * @date 2023/2/2
+ * @since 2023/02/02
  */
 public class BotException extends RuntimeException {
     private final String code;

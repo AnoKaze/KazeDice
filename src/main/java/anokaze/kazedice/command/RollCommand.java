@@ -9,6 +9,7 @@ import snw.jkook.message.Message;
 
 /**
  * @author AnoKaze
+ * @since 2023/02/01
  */
 public class RollCommand implements UserCommandExecutor {
 

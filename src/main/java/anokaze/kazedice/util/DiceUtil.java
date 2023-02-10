@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 
 /**
  * @author AnoKaze
+ * @since 2023/02/01
  */
 @Slf4j
 public class DiceUtil {
@@ -55,18 +56,18 @@ public class DiceUtil {
      */
     public static DiceGroup diceGroupParser(String diceGroup){
         Matcher matcher;
-        matcher = Patterns.nxxDicePattern.matcher(diceGroup);
+        matcher = Patterns.NXX_DICE_PATTERN.matcher(diceGroup);
         if(matcher.find()){
             int n = Integer.parseInt(matcher.group(1));
             return new DiceGroup(n, null, null);
         }
-        matcher = Patterns.ndxDicePattern.matcher(diceGroup);
+        matcher = Patterns.NDX_DICE_PATTERN.matcher(diceGroup);
         if(matcher.find()){
             int n = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
             int d = Integer.parseInt(matcher.group(2));
             return new DiceGroup(n,d,null);
         }
-        matcher = Patterns.ndkDicePattern.matcher(diceGroup);
+        matcher = Patterns.NDK_DICE_PATTERN.matcher(diceGroup);
         if(matcher.find()){
             int n = Integer.parseInt(matcher.group(1));
             int d = Integer.parseInt(matcher.group(2));
@@ -86,7 +87,7 @@ public class DiceUtil {
      */
     public static DiceExpression diceExpressionParser(String expression){
         List<String> operators = getOperators(expression);
-        String[] diceGroupStr = expression.split(String.valueOf(Patterns.operatorPattern));
+        String[] diceGroupStr = expression.split(String.valueOf(Patterns.OPERATOR_PATTERN));
         List<DiceGroup> diceGroups = new ArrayList<>();
         for(String item: diceGroupStr){
             DiceGroup newGroup = diceGroupParser(item);
@@ -97,7 +98,7 @@ public class DiceUtil {
 
     private static List<String> getOperators(String expression){
         List<String> operators = new ArrayList<>();
-        Matcher m = Patterns.operatorPattern.matcher(expression);
+        Matcher m = Patterns.OPERATOR_PATTERN.matcher(expression);
         while(m.find()){
             operators.add(m.group());
         }

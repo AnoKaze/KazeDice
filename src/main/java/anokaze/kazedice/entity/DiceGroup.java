@@ -5,6 +5,10 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * @author AnoKaze
+ * @since 2023/02/01
+ */
 @Getter
 public class DiceGroup {
     private final Integer n;
