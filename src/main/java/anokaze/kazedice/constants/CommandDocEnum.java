@@ -8,7 +8,7 @@ import lombok.Getter;
  * @since 2023/02/02
  */
 @Getter
-public enum CommandDocs {
+public enum CommandDocEnum {
     /**
      * 基本掷骰指令
      */
@@ -25,7 +25,7 @@ public enum CommandDocs {
     private final String description;
     private final String helpContent;
 
-    CommandDocs(String description, String helpContent){
+    CommandDocEnum(String description, String helpContent){
         this.description = description;
         this.helpContent = helpContent;
     }

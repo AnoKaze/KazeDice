@@ -1,11 +1,15 @@
 package anokaze.kazedice.mapper;
 
-import anokaze.kazedice.entity.Role;
+import anokaze.kazedice.entity.RolePojo;
 import anokaze.kazedice.util.GsonUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,47 +25,50 @@ public class RoleMapper {
         this.collection = collection;
     }
 
-    public void insertRole(Role role){
-        collection.insertOne(GsonUtil.toDocument(role));
+    public InsertOneResult insertRole(RolePojo role){
+        return collection.insertOne(GsonUtil.toDocument(role));
     }
 
-    public boolean removeRoleByName(String name){
+    public DeleteResult deleteRole(ObjectId id){
         BasicDBObject query = new BasicDBObject();
-        query.put("name", name);
-        Document find = collection.findOneAndDelete(query);
-        return find != null;
+        query.put("_id", id);
+        return collection.deleteOne(query);
     }
 
-    public Role findCurrentRole(String userId, String categoryId){
+    public UpdateResult updateRole(ObjectId id, RolePojo role){
         BasicDBObject query = new BasicDBObject();
-        query.put("userId", userId);
-        query.put("categoryId",categoryId);
+        query.put("_id", id);
+        return collection.replaceOne(query, GsonUtil.toDocument(role));
+    }
+
+    public RolePojo findRole(RolePojo role){
+        BasicDBObject query = getQueryBson(role);
         Document find = collection.find(query).first();
-        return GsonUtil.toBean(find, Role.class);
+        return GsonUtil.toBean(find, RolePojo.class);
     }
 
-    public List<Role> findUserRoles(String userId){
-        List<Role> result = new ArrayList<>();
-        BasicDBObject query = new BasicDBObject();
-        query.put("userId", userId);
+    public List<RolePojo> findRoles(RolePojo role){
+        List<RolePojo> result = new ArrayList<>();
+
+        BasicDBObject query = getQueryBson(role);
         FindIterable<Document> finds = collection.find(query);
         for(Document find: finds){
-            result.add(GsonUtil.toBean(find, Role.class));
+            result.add(GsonUtil.toBean(find, RolePojo.class));
         }
         return result;
     }
 
-    public Role findRoleByName(String name){
+    private BasicDBObject getQueryBson(RolePojo role){
         BasicDBObject query = new BasicDBObject();
-        query.put("name", name);
-        Document find = collection.find(query).first();
-        return GsonUtil.toBean(find, Role.class);
-    }
-
-    public boolean updateRoleByName(String name, Role role){
-        BasicDBObject query = new BasicDBObject();
-        query.put("name", name);
-        Document find = collection.findOneAndReplace(query, GsonUtil.toDocument(role));
-        return find != null;
+        if(role.getId() != null){
+            query.put("_id", role.getId());
+        }
+        if(role.getName() != null){
+            query.put("name", role.getName());
+        }
+        if(role.getUserId() != null){
+            query.put("userId", role.getUserId());
+        }
+        return query;
     }
 }

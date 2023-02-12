@@ -1,7 +1,7 @@
 package anokaze.kazedice.util;
 
-import anokaze.kazedice.constants.BotExceptions;
-import anokaze.kazedice.constants.Patterns;
+import anokaze.kazedice.constants.BotExceptionEnum;
+import anokaze.kazedice.constants.RegexConstant;
 import anokaze.kazedice.exception.BotException;
 import anokaze.kazedice.entity.DiceGroup;
 import anokaze.kazedice.entity.DiceExpression;
@@ -11,6 +11,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author AnoKaze
@@ -56,28 +57,28 @@ public class DiceUtil {
      */
     public static DiceGroup diceGroupParser(String diceGroup){
         Matcher matcher;
-        matcher = Patterns.NXX_DICE_PATTERN.matcher(diceGroup);
+        matcher = Pattern.compile(RegexConstant.NXX_DICE_REGEX) .matcher(diceGroup);
         if(matcher.find()){
             int n = Integer.parseInt(matcher.group(1));
             return new DiceGroup(n, null, null);
         }
-        matcher = Patterns.NDX_DICE_PATTERN.matcher(diceGroup);
+        matcher = Pattern.compile(RegexConstant.NDX_DICE_REGEX).matcher(diceGroup);
         if(matcher.find()){
             int n = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
             int d = Integer.parseInt(matcher.group(2));
             return new DiceGroup(n,d,null);
         }
-        matcher = Patterns.NDK_DICE_PATTERN.matcher(diceGroup);
+        matcher = Pattern.compile(RegexConstant.NDK_DICE_REGEX).matcher(diceGroup);
         if(matcher.find()){
             int n = Integer.parseInt(matcher.group(1));
             int d = Integer.parseInt(matcher.group(2));
             int k = Integer.parseInt(matcher.group(3));
             if(Math.abs(n) < k){
-                throw new BotException(BotExceptions.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
+                throw new BotException(BotExceptionEnum.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
             }
             return new DiceGroup(n,d,k);
         }
-        throw new BotException(BotExceptions.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
+        throw new BotException(BotExceptionEnum.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
     }
 
     /***
@@ -87,7 +88,7 @@ public class DiceUtil {
      */
     public static DiceExpression diceExpressionParser(String expression){
         List<String> operators = getOperators(expression);
-        String[] diceGroupStr = expression.split(String.valueOf(Patterns.OPERATOR_PATTERN));
+        String[] diceGroupStr = expression.split(RegexConstant.OPERATOR_REGEX);
         List<DiceGroup> diceGroups = new ArrayList<>();
         for(String item: diceGroupStr){
             DiceGroup newGroup = diceGroupParser(item);
@@ -98,7 +99,7 @@ public class DiceUtil {
 
     private static List<String> getOperators(String expression){
         List<String> operators = new ArrayList<>();
-        Matcher m = Patterns.OPERATOR_PATTERN.matcher(expression);
+        Matcher m = Pattern.compile(RegexConstant.OPERATOR_REGEX).matcher(expression);
         while(m.find()){
             operators.add(m.group());
         }

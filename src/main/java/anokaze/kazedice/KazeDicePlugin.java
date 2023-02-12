@@ -3,9 +3,9 @@ package anokaze.kazedice;
 import anokaze.kazedice.command.RollCommand;
 import anokaze.kazedice.command.StateCommand;
 import anokaze.kazedice.command.StateRemoveCommand;
-import anokaze.kazedice.constants.CommandDocs;
+import anokaze.kazedice.constants.CommandDocEnum;
 import anokaze.kazedice.mapper.MapperManager;
-import com.mongodb.client.MongoClients;
+import anokaze.kazedice.service.ServiceManager;
 import lombok.extern.slf4j.Slf4j;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.plugin.BasePlugin;
@@ -18,6 +18,7 @@ import snw.jkook.plugin.BasePlugin;
 public class KazeDicePlugin extends BasePlugin {
     private static KazeDicePlugin instance;
     private static MapperManager mapperManager;
+    private static ServiceManager serviceManager;
 
     @Override
     public void onLoad() {
@@ -29,13 +30,14 @@ public class KazeDicePlugin extends BasePlugin {
     @Override
     public void onEnable(){
         mapperManager = new MapperManager();
+        serviceManager = new ServiceManager();
 
         createCommand("r")
                 .addAlias("roll")
                 .addOptionalArgument(String.class, "1d100")
                 .executesUser(new RollCommand())
-                .setDescription(CommandDocs.ROLL_COMMAND_DOC.getDescription())
-                .setHelpContent(CommandDocs.ROLL_COMMAND_DOC.getHelpContent())
+                .setDescription(CommandDocEnum.ROLL_COMMAND_DOC.getDescription())
+                .setHelpContent(CommandDocEnum.ROLL_COMMAND_DOC.getHelpContent())
                 .register(getInstance());
 
         createCommand("st")
@@ -64,6 +66,10 @@ public class KazeDicePlugin extends BasePlugin {
 
     public static MapperManager getMapperManager(){
         return mapperManager;
+    }
+
+    public static ServiceManager getServiceManager() {
+        return serviceManager;
     }
 
     private JKookCommand createCommand(String rootName){

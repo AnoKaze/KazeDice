@@ -4,18 +4,15 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
-import java.util.Map;
-
 /**
  * @author AnoKaze
- * @since 2023/02/08
+ * @since 2023/2/11
  */
 @Data
-public class Role {
+public class RoleBindPojo {
     @SerializedName("_id")
     private ObjectId id;
-    private String name;
-    private String userId;
     private String categoryId;
-    private Map<String, Integer> attributes;
+    private String userId;
+    private ObjectId roleId;
 }

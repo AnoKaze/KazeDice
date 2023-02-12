@@ -14,6 +14,8 @@ public class MapperManager {
     private final MongoClient client;
     private final RoleMapper roleMapper;
 
+    private final RoleBindMapper roleBindMapper;
+
     public MapperManager(){
         String uri = KazeDicePlugin.getInstance().getConfig().getString("mongo.uri");
         assert uri != null;
@@ -21,6 +23,7 @@ public class MapperManager {
         MongoDatabase database = client.getDatabase("kazedice");
 
         roleMapper = new RoleMapper(database.getCollection("role"));
+        roleBindMapper = new RoleBindMapper(database.getCollection("role_bind"));
     }
 
     public void disconnect(){
@@ -29,5 +32,9 @@ public class MapperManager {
 
     public RoleMapper getRoleMapper(){
         return roleMapper;
+    }
+
+    public RoleBindMapper getRoleBindMapper() {
+        return roleBindMapper;
     }
 }

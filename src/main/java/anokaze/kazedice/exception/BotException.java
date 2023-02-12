@@ -1,6 +1,6 @@
 package anokaze.kazedice.exception;
 
-import anokaze.kazedice.constants.BotExceptions;
+import anokaze.kazedice.constants.BotExceptionEnum;
 
 /**
  * Bot在运行中产生的可控报错
@@ -12,13 +12,13 @@ public class BotException extends RuntimeException {
     private final String message;
     private final Object data;
 
-    public BotException(BotExceptions exceptionEnum){
+    public BotException(BotExceptionEnum exceptionEnum){
         this.code = exceptionEnum.getCode();
         this.message = exceptionEnum.getMessage();
         this.data = null;
     }
 
-    public BotException(BotExceptions exceptionEnum, Object data){
+    public BotException(BotExceptionEnum exceptionEnum, Object data){
         this.code = exceptionEnum.getCode();
         this.message = exceptionEnum.getMessage();
         this.data = data;
