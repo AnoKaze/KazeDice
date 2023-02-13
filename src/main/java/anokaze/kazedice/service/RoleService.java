@@ -26,6 +26,13 @@ public class RoleService {
     }
 
     public void bindRoleToCategory(RolePojo role, String categoryId){
+        RoleBindPojo query = new RoleBindPojo();
+        query.setCategoryId(categoryId);
+        query.setUserId(role.getUserId());
+        RoleBindPojo exist = roleBindMapper.findRoleBind(query);
+        if(exist != null){
+            roleBindMapper.deleteRoleBind(exist.getId());
+        }
         RoleBindPojo roleBind = new RoleBindPojo();
         roleBind.setCategoryId(categoryId);
         roleBind.setUserId(role.getUserId());
@@ -67,7 +74,7 @@ public class RoleService {
         return roleMapper.findRoles(query);
     }
 
-    public RolePojo findBindRole(String categoryId, String userId){
+    public RolePojo findBoundRole(String categoryId, String userId){
         RoleBindPojo query1 = new RoleBindPojo();
         query1.setCategoryId(categoryId);
         query1.setUserId(userId);
@@ -77,5 +84,11 @@ public class RoleService {
         RolePojo query2 = new RolePojo();
         query2.setId(roleBind.getId());
         return roleMapper.findRole(query2);
+    }
+
+    public RoleBindPojo findBindByRole(ObjectId roleId){
+        RoleBindPojo query = new RoleBindPojo();
+        query.setRoleId(roleId);
+        return roleBindMapper.findRoleBind(query);
     }
 }

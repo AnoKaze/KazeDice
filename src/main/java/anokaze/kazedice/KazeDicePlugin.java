@@ -45,6 +45,8 @@ public class KazeDicePlugin extends BasePlugin {
                 .addArgument(String.class)
                 .addOptionalArgument(String.class, "")
                 .executesUser(new StateCommand())
+                .setDescription(CommandDocEnum.STATE_COMMAND_DOC.getDescription())
+                .setHelpContent(CommandDocEnum.STATE_COMMAND_DOC.getHelpContent())
                 .addSubcommand(
                         new JKookCommand("rm")
                                 .addAlias("remove")

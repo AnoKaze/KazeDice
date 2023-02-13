@@ -24,131 +24,110 @@ import java.util.regex.Pattern;
 public class StateCommand implements UserCommandExecutor {
     @Override
     public void onCommand(User user, Object[] arguments, Message message) {
-        String defaultName = "自定义角色";
         RoleService roleService = KazeDicePlugin.getServiceManager().getRoleService();
-
-        boolean hasName = !Objects.equals(arguments[1], "");
-
         String userId = user.getId();
-        String name = hasName ? (String)arguments[0] : defaultName;
-        String attributeStr = hasName ? (String)arguments[1] : (String)arguments[0];
-        if(!Pattern.matches(RegexConstant.STATES_REGEX, attributeStr)){
-            message.reply(":x:参数`" + attributeStr + "`输入错误，请重新输入！");
-            return;
-        }
-
-        StringBuilder reply = new StringBuilder();
-
+        String categoryId;
         if(message instanceof TextChannelMessage){
             Category category = ((TextChannelMessage) message).getChannel().getParent();
             assert category != null;
-            String categoryId = category.getId();
-
-            RolePojo bindRole = roleService.findBindRole(categoryId, userId);
-            RolePojo existRole = roleService.findRoleByName(userId, name);
-            RolePojo role;
-
-            if(hasName){
-                if(existRole == null){
-                    role = new RolePojo();
-                    role.setName(name);
-                    role.setUserId(userId);
-                    role.initAttributes();
-                    appendAttributes(role.getAttributes(), attributeStr);
-                    roleService.insertRole(role);
-                    reply.append("已创建新角色[").append(name).append("]");
-
-                    if(bindRole == null){
-                        roleService.bindRoleToCategory(role, categoryId);
-                        reply.append("，并设置为当前分组的默认角色。");
-                    }
-                    else{
-                        reply.append("。");
-                    }
-                }
-                else{
-                    role = existRole;
-                    appendAttributes(role.getAttributes(), attributeStr);
-                    roleService.updateRole(role.getId(), role);
-                    reply.append("已修改角色[").append(role.getName()).append("]的信息。");
-                }
-            }
-            else{
-                if(bindRole == null){
-                    if(existRole != null) {
-                        role = existRole;
-                    }
-                    else {
-                        role = new RolePojo();
-                        role.setName(name);
-                        role.setUserId(userId);
-                        role.initAttributes();
-                    }
-                    appendAttributes(role.getAttributes(), attributeStr);
-                    roleService.insertRole(role);
-                    roleService.bindRoleToCategory(role, categoryId);
-                    reply.append("已创建新角色[").append(name).append("]，并设置为当前分组的默认角色。");
-                }
-                else{
-                    role = bindRole;
-                    appendAttributes(role.getAttributes(), attributeStr);
-                    roleService.updateRole(role.getId(), role);
-                    reply.append("已修改角色[").append(role.getName()).append("]的信息。");
-                }
-            }
+            categoryId = category.getId();
         }
         else{
-            RolePojo existRole = roleService.findRoleByName(userId, name);
-            RolePojo role;
+            categoryId = "private";
+        }
+        String arg0 = (String) arguments[0];
+        String arg1 = (String) arguments[1];
 
-            if(hasName){
-                if(existRole == null) {
-                    role = new RolePojo();
-                    role.setName(name);
-                    role.setUserId(userId);
-                    role.initAttributes();
-                    appendAttributes(role.getAttributes(), attributeStr);
-                    roleService.insertRole(role);
-                    reply.append("已创建新角色[").append(name).append("]。");
+        boolean isSingleArg = "".equals(arg1);
+        if(isSingleArg && !Pattern.matches(RegexConstant.STATES_REGEX, arg0)){
+            RolePojo exist = roleService.findRoleByName(userId, arg0);
+            if(exist == null){
+                message.reply(":x:角色["+ arg0 +"]不存在，绑定失败！");
+                return;
+            }
+            roleService.bindRoleToCategory(exist, categoryId);
+            message.reply("已将角色[" + arg0 + "]与分组[" + categoryId + "]绑定。");
+            return;
+        }
+        if(!isSingleArg && !Pattern.matches(RegexConstant.STATES_REGEX, arg1)){
+            message.reply(":x:参数`" + arg1 + "`输入错误，请重新输入！");
+            return;
+        }
+        String name = isSingleArg ? "自定义角色" : arg0;
+        String attributes = isSingleArg ? arg0 : arg1;
+
+        RolePojo exist = roleService.findRoleByName(userId, name);
+        RolePojo bound = roleService.findBoundRole(categoryId, userId);
+        if(isSingleArg){
+            if(bound != null){
+                applyAttributes(bound, attributes);
+                roleService.updateRole(bound.getId(), bound);
+                message.reply("已修改角色[" + bound.getName() + "]的数据。");
+                return;
+            }
+            if(exist != null){
+                applyAttributes(exist, attributes);
+                roleService.updateRole(exist.getId(), exist);
+                roleService.bindRoleToCategory(exist, categoryId);
+                message.reply("已修改角色[" + exist.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+                return;
+            }
+            RolePojo role = new RolePojo(name, userId);
+            applyAttributes(role, attributes);
+            roleService.insertRole(role);
+            roleService.bindRoleToCategory(role, categoryId);
+            message.reply("已新建角色[" + role.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+        }
+        else{
+            if(exist != null){
+                applyAttributes(exist, attributes);
+                roleService.updateRole(exist.getId(), exist);
+                if(bound == null){
+                    roleService.bindRoleToCategory(exist, categoryId);
+                    message.reply("已修改角色[" + exist.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+                    return;
                 }
-                else {
-                    role = existRole;
-                    appendAttributes(role.getAttributes(), attributeStr);
-                    roleService.updateRole(role.getId(), role);
-                    reply.append("已修改角色[").append(role.getName()).append("]的信息。");
-                }
+                message.reply("已修改角色[" + exist.getName() + "]的数据。");
             }
             else{
-                if(existRole != null) {
-                    role = existRole;
-                }
-                else {
-                    role = new RolePojo();
-                    role.setName(name);
-                    role.setUserId(userId);
-                    role.initAttributes();
-                }
-                appendAttributes(role.getAttributes(), attributeStr);
+                RolePojo role = new RolePojo(name, userId);
+                applyAttributes(role, attributes);
                 roleService.insertRole(role);
-                reply.append("已创建新角色[").append(name).append("]，并设置为当前分组的默认角色。");
+                if(bound == null){
+                    roleService.bindRoleToCategory(role, categoryId);
+                    message.reply("已新建角色[" + role.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+                    return;
+                }
+                message.reply("已新建角色[" + role.getName() + "]的数据。");
             }
         }
-
-        message.reply(reply.toString());
     }
 
-    private void appendAttributes(Map<String, Integer> attributes, String attributeStr){
-        Matcher m = Pattern.compile(RegexConstant.STATE_REGEX).matcher(attributeStr);
+    private void applyAttributes(RolePojo role, String attributes){
+        Matcher m = Pattern.compile(RegexConstant.STATE_REGEX).matcher(attributes);
         while(m.find()){
-            attributes.put(m.group(1), Integer.parseInt(m.group(2)));
+            role.getAttributes().put(m.group(1), Integer.parseInt(m.group(2)));
         }
-        Integer dexterity = attributes.get("敏捷");
-        Integer intelligence = attributes.get("智力");
-        Integer education = attributes.get("教育");
+        Integer con = role.getAttributes().get("体质");
+        Integer siz = role.getAttributes().get("体型");
+        Integer dex = role.getAttributes().get("敏捷");
+        Integer intA = role.getAttributes().get("智力");
+        Integer pow = role.getAttributes().get("意志");
+        Integer edu = role.getAttributes().get("教育");
+        Integer luck = role.getAttributes().get("幸运");
 
-        attributes.put("闪避", dexterity / 2);
-        attributes.put("灵感", intelligence);
-        attributes.put("知识", education);
-        attributes.put("母语", education);
+        role.getAttributes().put("闪避", dex / 2);
+        role.getAttributes().put("灵感", intA);
+        role.getAttributes().put("知识", edu);
+        role.getAttributes().put("母语", edu);
+
+        role.getStates().put("生命", con + siz);
+        role.getStates().put("最大生命", con + siz);
+        role.getStates().put("理智", pow);
+        role.getStates().put("最大理智", 99);
+        role.getStates().put("幸运", luck);
+        role.getStates().put("最大幸运", 99);
+        role.getStates().put("魔法", pow / 5);
+        role.getStates().put("最大魔法", 24);
     }
 }

@@ -19,12 +19,22 @@ public class RolePojo {
     private String name;
     private String userId;
     private Map<String, Integer> attributes;
+    private Map<String, Integer> states;
+    private Map<String, Integer> bonus;
 
-    public void initAttributes(){
+    public RolePojo(){}
+
+    public RolePojo(String name, String userId){
+        this.name = name;
+        this.userId = userId;
+
         attributes = new HashMap<>(60);
         AttributeEnum[] defaultAttributes = AttributeEnum.values();
         for(AttributeEnum attribute: defaultAttributes){
             attributes.put(attribute.getName(), attribute.getBase());
         }
+
+        states = new HashMap<>(8);
+        bonus = new HashMap<>();
     }
 }
