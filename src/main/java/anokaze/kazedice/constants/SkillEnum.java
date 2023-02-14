@@ -7,17 +7,7 @@ import lombok.Getter;
  * @since 2023/2/11
  */
 @Getter
-public enum AttributeEnum {
-    // 属性
-    CHARACTERISTIC_STR("力量", 0),
-    CHARACTERISTIC_CON("体质", 0),
-    CHARACTERISTIC_SIZ("体型", 0),
-    CHARACTERISTIC_DEX("敏捷", 0),
-    CHARACTERISTIC_APP("外貌", 0),
-    CHARACTERISTIC_INT("智力", 0),
-    CHARACTERISTIC_POW("意志", 0),
-    CHARACTERISTIC_EDU("教育", 0),
-    CHARACTERISTIC_LUCK("幸运", 0),
+public enum SkillEnum {
     // 技能
     SKILL_ACCOUNTING("会计", 5),
     SKILL_ANTHROPOLOGY("人类学", 1),
@@ -69,10 +59,10 @@ public enum AttributeEnum {
     SKILL_ARTILLERY("炮术", 1);
 
     private final String name;
-    private final Integer base;
+    private final Integer defaultValue;
 
-    AttributeEnum(String name, Integer base){
+    SkillEnum(String name, Integer base){
         this.name = name;
-        this.base = base;
+        this.defaultValue = base;
     }
 }

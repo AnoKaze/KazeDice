@@ -4,7 +4,6 @@ import anokaze.kazedice.entity.RoleBindPojo;
 import anokaze.kazedice.entity.RolePojo;
 import anokaze.kazedice.mapper.RoleBindMapper;
 import anokaze.kazedice.mapper.RoleMapper;
-import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -33,14 +32,11 @@ public class RoleService {
         if(exist != null){
             roleBindMapper.deleteRoleBind(exist.getId());
         }
-        RoleBindPojo roleBind = new RoleBindPojo();
-        roleBind.setCategoryId(categoryId);
-        roleBind.setUserId(role.getUserId());
-        roleBind.setRoleId(role.getId());
+        RoleBindPojo roleBind = new RoleBindPojo(categoryId, role.getUserId(), role.getId());
         roleBindMapper.insertRoleBind(roleBind);
     }
 
-    public void deleteRole(ObjectId roleId){
+    public void deleteRole(String roleId){
         roleMapper.deleteRole(roleId);
 
         RoleBindPojo query = new RoleBindPojo();
@@ -51,11 +47,11 @@ public class RoleService {
         }
     }
 
-    public void updateRole(ObjectId id, RolePojo role){
-        roleMapper.updateRole(id, role);
+    public void updateRole(RolePojo role){
+        roleMapper.updateRole(role);
     }
 
-    public RolePojo findRoleById(ObjectId id){
+    public RolePojo findRoleById(String id){
         RolePojo query = new RolePojo();
         query.setId(id);
         return roleMapper.findRole(query);
@@ -82,11 +78,11 @@ public class RoleService {
         if(roleBind == null){ return null; }
 
         RolePojo query2 = new RolePojo();
-        query2.setId(roleBind.getId());
+        query2.setId(roleBind.getRoleId());
         return roleMapper.findRole(query2);
     }
 
-    public RoleBindPojo findBindByRole(ObjectId roleId){
+    public RoleBindPojo findBindByRole(String roleId){
         RoleBindPojo query = new RoleBindPojo();
         query.setRoleId(roleId);
         return roleBindMapper.findRoleBind(query);

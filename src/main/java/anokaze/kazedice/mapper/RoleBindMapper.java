@@ -29,13 +29,13 @@ public class RoleBindMapper {
         return collection.insertOne(GsonUtil.toDocument(roleBind));
     }
 
-    public DeleteResult deleteRoleBind(ObjectId id){
+    public DeleteResult deleteRoleBind(String id){
         BasicDBObject query = new BasicDBObject();
         query.put("_id", id);
         return collection.deleteOne(query);
     }
 
-    public UpdateResult updateRoleBind(ObjectId id, RoleBindPojo roleBindPojo){
+    public UpdateResult updateRoleBind(String id, RoleBindPojo roleBindPojo){
         BasicDBObject query = new BasicDBObject();
         query.put("_id", id);
         return collection.replaceOne(query, GsonUtil.toDocument(roleBindPojo));

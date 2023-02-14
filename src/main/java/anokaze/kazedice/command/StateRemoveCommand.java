@@ -35,7 +35,7 @@ public class StateRemoveCommand implements UserCommandExecutor {
             Category category = KazeDicePlugin.getInstance().getCore().getHttpAPI().getCategory(roleBind.getCategoryId());
             if(category != null){
                 message.reply(":x:输入的角色已与服务器[" + category.getGuild().getName() +
-                        "]中的[" + category.getName() + "]分组绑定，请接触绑定后再删除！");
+                        "]中的[" + category.getName() + "]分组绑定，请解除绑定后再删除！");
                 return;
             }
         }

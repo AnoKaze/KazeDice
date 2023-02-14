@@ -11,8 +11,6 @@ import snw.jkook.entity.channel.Category;
 import snw.jkook.message.Message;
 import snw.jkook.message.TextChannelMessage;
 
-import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,14 +24,13 @@ public class StateCommand implements UserCommandExecutor {
     public void onCommand(User user, Object[] arguments, Message message) {
         RoleService roleService = KazeDicePlugin.getServiceManager().getRoleService();
         String userId = user.getId();
-        String categoryId;
+        String categoryId = "private";
+        String categoryName = "私聊窗口";
         if(message instanceof TextChannelMessage){
             Category category = ((TextChannelMessage) message).getChannel().getParent();
             assert category != null;
             categoryId = category.getId();
-        }
-        else{
-            categoryId = "private";
+            categoryName = category.getName();
         }
         String arg0 = (String) arguments[0];
         String arg1 = (String) arguments[1];
@@ -46,7 +43,7 @@ public class StateCommand implements UserCommandExecutor {
                 return;
             }
             roleService.bindRoleToCategory(exist, categoryId);
-            message.reply("已将角色[" + arg0 + "]与分组[" + categoryId + "]绑定。");
+            message.reply("已将角色[" + arg0 + "]与分组[" + categoryName + "]绑定。");
             return;
         }
         if(!isSingleArg && !Pattern.matches(RegexConstant.STATES_REGEX, arg1)){
@@ -61,30 +58,30 @@ public class StateCommand implements UserCommandExecutor {
         if(isSingleArg){
             if(bound != null){
                 applyAttributes(bound, attributes);
-                roleService.updateRole(bound.getId(), bound);
+                roleService.updateRole(bound);
                 message.reply("已修改角色[" + bound.getName() + "]的数据。");
                 return;
             }
             if(exist != null){
                 applyAttributes(exist, attributes);
-                roleService.updateRole(exist.getId(), exist);
+                roleService.updateRole(exist);
                 roleService.bindRoleToCategory(exist, categoryId);
-                message.reply("已修改角色[" + exist.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+                message.reply("已修改角色[" + exist.getName() + "]的数据, 并与分组[" + categoryName +"]绑定。");
                 return;
             }
             RolePojo role = new RolePojo(name, userId);
             applyAttributes(role, attributes);
             roleService.insertRole(role);
             roleService.bindRoleToCategory(role, categoryId);
-            message.reply("已新建角色[" + role.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+            message.reply("已新建角色[" + role.getName() + "]的数据, 并与分组[" + categoryName +"]绑定。");
         }
         else{
             if(exist != null){
                 applyAttributes(exist, attributes);
-                roleService.updateRole(exist.getId(), exist);
+                roleService.updateRole(exist);
                 if(bound == null){
                     roleService.bindRoleToCategory(exist, categoryId);
-                    message.reply("已修改角色[" + exist.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+                    message.reply("已修改角色[" + exist.getName() + "]的数据, 并与分组[" + categoryName +"]绑定。");
                     return;
                 }
                 message.reply("已修改角色[" + exist.getName() + "]的数据。");
@@ -95,7 +92,7 @@ public class StateCommand implements UserCommandExecutor {
                 roleService.insertRole(role);
                 if(bound == null){
                     roleService.bindRoleToCategory(role, categoryId);
-                    message.reply("已新建角色[" + role.getName() + "]的数据, 并与分组[" + categoryId +"]绑定。");
+                    message.reply("已新建角色[" + role.getName() + "]的数据, 并与分组[" + categoryName +"]绑定。");
                     return;
                 }
                 message.reply("已新建角色[" + role.getName() + "]的数据。");
@@ -106,20 +103,28 @@ public class StateCommand implements UserCommandExecutor {
     private void applyAttributes(RolePojo role, String attributes){
         Matcher m = Pattern.compile(RegexConstant.STATE_REGEX).matcher(attributes);
         while(m.find()){
-            role.getAttributes().put(m.group(1), Integer.parseInt(m.group(2)));
+            String key = m.group(1);
+            Integer value = Integer.parseInt(m.group(2));
+            if(role.getCharacteristics().containsKey(key)){
+                role.getCharacteristics().put(key, value);
+            }
+            else {
+                role.getSkills().put(key, value);
+            }
         }
-        Integer con = role.getAttributes().get("体质");
-        Integer siz = role.getAttributes().get("体型");
-        Integer dex = role.getAttributes().get("敏捷");
-        Integer intA = role.getAttributes().get("智力");
-        Integer pow = role.getAttributes().get("意志");
-        Integer edu = role.getAttributes().get("教育");
-        Integer luck = role.getAttributes().get("幸运");
+        Integer con = role.getCharacteristics().get("体质");
+        Integer siz = role.getCharacteristics().get("体型");
+        Integer dex = role.getCharacteristics().get("敏捷");
+        Integer intA = role.getCharacteristics().get("智力");
+        Integer pow = role.getCharacteristics().get("意志");
+        Integer edu = role.getCharacteristics().get("教育");
+        Integer luck = role.getCharacteristics().get("幸运");
 
-        role.getAttributes().put("闪避", dex / 2);
-        role.getAttributes().put("灵感", intA);
-        role.getAttributes().put("知识", edu);
-        role.getAttributes().put("母语", edu);
+        role.getCharacteristics().put("知识", edu);
+        role.getCharacteristics().put("灵感", intA);
+
+        role.getSkills().put("闪避", dex / 2);
+        role.getSkills().put("母语", edu);
 
         role.getStates().put("生命", con + siz);
         role.getStates().put("最大生命", con + siz);

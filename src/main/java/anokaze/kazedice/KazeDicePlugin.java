@@ -1,8 +1,6 @@
 package anokaze.kazedice;
 
-import anokaze.kazedice.command.RollCommand;
-import anokaze.kazedice.command.StateCommand;
-import anokaze.kazedice.command.StateRemoveCommand;
+import anokaze.kazedice.command.*;
 import anokaze.kazedice.constants.CommandDocEnum;
 import anokaze.kazedice.mapper.MapperManager;
 import anokaze.kazedice.service.ServiceManager;
@@ -52,6 +50,23 @@ public class KazeDicePlugin extends BasePlugin {
                                 .addAlias("remove")
                                 .addArgument(String.class)
                                 .executesUser(new StateRemoveCommand())
+                )
+                .addSubcommand(
+                        new JKookCommand("ls")
+                                .addAlias("list")
+                                .executesUser(new StateListCommand())
+                )
+                .addSubcommand(
+                        new JKookCommand("rn")
+                                .addAlias("rename")
+                                .addArgument(String.class)
+                                .executesUser(new StateRenameCommand())
+
+                )
+                .addSubcommand(
+                        new JKookCommand("show")
+                                .addOptionalArgument(String.class, "")
+                                .executesUser(new StateShowCommand())
                 )
                 .register(getInstance());
     }

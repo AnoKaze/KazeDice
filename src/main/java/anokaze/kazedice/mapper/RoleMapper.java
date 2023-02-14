@@ -29,15 +29,15 @@ public class RoleMapper {
         return collection.insertOne(GsonUtil.toDocument(role));
     }
 
-    public DeleteResult deleteRole(ObjectId id){
+    public DeleteResult deleteRole(String id){
         BasicDBObject query = new BasicDBObject();
         query.put("_id", id);
         return collection.deleteOne(query);
     }
 
-    public UpdateResult updateRole(ObjectId id, RolePojo role){
+    public UpdateResult updateRole(RolePojo role){
         BasicDBObject query = new BasicDBObject();
-        query.put("_id", id);
+        query.put("_id", role.getId());
         return collection.replaceOne(query, GsonUtil.toDocument(role));
     }
 

@@ -11,8 +11,17 @@ import org.bson.types.ObjectId;
 @Data
 public class RoleBindPojo {
     @SerializedName("_id")
-    private ObjectId id;
+    private String id;
     private String categoryId;
     private String userId;
-    private ObjectId roleId;
+    private String roleId;
+
+    public RoleBindPojo(){}
+
+    public RoleBindPojo(String categoryId, String userId, String roleId){
+        this.id = categoryId + userId;
+        this.categoryId = categoryId;
+        this.userId = userId;
+        this.roleId = roleId;
+    }
 }
