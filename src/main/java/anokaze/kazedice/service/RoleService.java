@@ -5,6 +5,7 @@ import anokaze.kazedice.entity.RolePojo;
 import anokaze.kazedice.mapper.RoleBindMapper;
 import anokaze.kazedice.mapper.RoleMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +35,18 @@ public class RoleService {
         }
         RoleBindPojo roleBind = new RoleBindPojo(categoryId, role.getUserId(), role.getId());
         roleBindMapper.insertRoleBind(roleBind);
+    }
+
+    public void unbindRoleFromCategory(RolePojo role, String categoryId){
+        RoleBindPojo query = new RoleBindPojo();
+        query.setCategoryId(categoryId);
+        query.setUserId(role.getUserId());
+        query.setRoleId(role.getId());
+        RoleBindPojo exist = roleBindMapper.findRoleBind(query);
+
+        if(exist != null) {
+            roleBindMapper.deleteRoleBind(exist.getId());
+        }
     }
 
     public void deleteRole(String roleId){
@@ -80,6 +93,25 @@ public class RoleService {
         RolePojo query2 = new RolePojo();
         query2.setId(roleBind.getRoleId());
         return roleMapper.findRole(query2);
+    }
+
+    public List<RolePojo> findCategoryRoles(String categoryId){
+        RoleBindPojo query = new RoleBindPojo();
+        query.setCategoryId(categoryId);
+        List<RoleBindPojo> binds = roleBindMapper.findRoleBinds(query);
+
+        List<RolePojo> result = new ArrayList<>(binds.size());
+        for(RoleBindPojo bind: binds){
+            RolePojo query0 = new RolePojo();
+            query.setUserId(bind.getUserId());
+            RolePojo role = roleMapper.findRole(query0);
+
+            if(role != null){
+                result.add(role);
+            }
+        }
+
+        return result;
     }
 
     public RoleBindPojo findBindByRole(String roleId){

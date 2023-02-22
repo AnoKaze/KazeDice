@@ -5,10 +5,10 @@ import anokaze.kazedice.constants.SkillEnum;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author AnoKaze
@@ -23,7 +23,7 @@ public class RolePojo {
     private Map<String, Integer> characteristics;
     private Map<String, Integer> skills;
     private Map<String, Integer> states;
-    private Map<String, Integer> bonus;
+    private Set<String> bonus;
 
     public RolePojo(){}
 
@@ -45,7 +45,7 @@ public class RolePojo {
         }
 
         states = new HashMap<>(8);
-        bonus = new HashMap<>();
+        bonus = new HashSet<>();
     }
 
     public Integer getAttribute(String name){
@@ -58,7 +58,12 @@ public class RolePojo {
         if(skills.containsKey(name)){
             return skills.get(name);
         }
-
         return 0;
+    }
+
+    public void addBonus(String name){
+        if(skills.containsKey(name)){
+            bonus.add(name);
+        }
     }
 }

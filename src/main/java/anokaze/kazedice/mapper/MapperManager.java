@@ -18,8 +18,10 @@ public class MapperManager {
 
     public MapperManager(){
         String uri = KazeDicePlugin.getInstance().getConfig().getString("mongo.uri");
+        String username = "kazedice";
+        String password = "touchfish";
         assert uri != null;
-        client = MongoClients.create(uri);
+        client = MongoClients.create("mongodb://" + username + ":" + password + "@" + uri);
         MongoDatabase database = client.getDatabase("kazedice");
 
         roleMapper = new RoleMapper(database.getCollection("role"));

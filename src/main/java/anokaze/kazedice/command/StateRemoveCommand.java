@@ -30,15 +30,6 @@ public class StateRemoveCommand implements UserCommandExecutor {
             return;
         }
 
-        RoleBindPojo roleBind = roleService.findBindByRole(role.getId());
-        if(roleBind != null){
-            Category category = KazeDicePlugin.getInstance().getCore().getHttpAPI().getCategory(roleBind.getCategoryId());
-            if(category != null){
-                message.reply(":x:输入的角色已与服务器[" + category.getGuild().getName() +
-                        "]中的[" + category.getName() + "]分组绑定，请解除绑定后再删除！");
-                return;
-            }
-        }
         roleService.deleteRole(role.getId());
         message.reply("已删除角色[" + name + "]。");
     }

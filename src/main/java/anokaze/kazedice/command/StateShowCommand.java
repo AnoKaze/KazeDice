@@ -22,7 +22,6 @@ import snw.jkook.message.component.card.module.SectionModule;
 import snw.jkook.message.component.card.structure.Paragraph;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -77,9 +76,12 @@ public class StateShowCommand implements UserCommandExecutor {
             skills.add(new StringBuilder());
         }
 
+        List<Map.Entry<String, Integer>> sortedSkills = new ArrayList<>(role.getSkills().entrySet());
+        sortedSkills.sort((skill1, skill2) -> skill2.getValue() - skill1.getValue());
+
         counter = 0;
-        for(String key: role.getSkills().keySet()){
-            skills.get(counter).append(key).append("：").append(role.getSkills().get(key)).append("\n");
+        for(Map.Entry<String, Integer> pair: sortedSkills){
+            skills.get(counter).append(pair.getKey()).append("：").append(pair.getValue()).append("\n");
             counter += 1;
             if(counter % paragraphColumns == 0){ counter = 0; }
         }

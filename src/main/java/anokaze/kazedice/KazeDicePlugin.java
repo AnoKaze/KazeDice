@@ -30,6 +30,7 @@ public class KazeDicePlugin extends BasePlugin {
         mapperManager = new MapperManager();
         serviceManager = new ServiceManager();
 
+        // region roll
         createCommand("r")
                 .addAlias("roll")
                 .addOptionalArgument(String.class, "1d100")
@@ -37,7 +38,25 @@ public class KazeDicePlugin extends BasePlugin {
                 .setDescription(CommandDocEnum.ROLL_COMMAND_DOC.getDescription())
                 .setHelpContent(CommandDocEnum.ROLL_COMMAND_DOC.getHelpContent())
                 .register(getInstance());
-
+        createCommand("ra")
+                .addAlias("rollAssay")
+                .addArgument(String.class)
+                .addOptionalArgument(Integer.class, -1)
+                .executesUser(new RollAssayCommand())
+                .register(getInstance());
+        createCommand("rav")
+                .addAlias("rollAssayVersus")
+                .addArgument(String.class)
+                .addOptionalArgument(Integer.class, -1)
+                .executesUser(new RollAssayVersusCommand())
+                .register(getInstance());
+        createCommand("sc")
+                .addAlias("sanCheck")
+                .addArgument(String.class)
+                .executesUser(new SanCheckCommand())
+                .register(getInstance());
+        // endregion
+        // region state commands
         createCommand("st")
                 .addAlias("state")
                 .addArgument(String.class)
@@ -69,6 +88,7 @@ public class KazeDicePlugin extends BasePlugin {
                                 .executesUser(new StateShowCommand())
                 )
                 .register(getInstance());
+        // endregion
     }
 
     @Override
