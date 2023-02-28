@@ -11,32 +11,40 @@ import snw.jkook.entity.channel.Category;
 import snw.jkook.message.Message;
 import snw.jkook.message.TextChannelMessage;
 
+import java.util.List;
+
 /**
  * @author AnoKaze
- * @since 2023/2/16
+ * @since 2023/2/23
  */
-public class SanCheckCommand implements UserCommandExecutor {
+public class TeamSanCheckCommand implements UserCommandExecutor {
     @Override
     public void onCommand(User user, Object[] arguments, Message message) {
         RoleService roleService = KazeDicePlugin.getServiceManager().getRoleService();
         DiceService diceService = KazeDicePlugin.getServiceManager().getDiceService();
 
-        SanExpression expression = (SanExpression) arguments[0];
-
-        String userId = user.getId();
-        String categoryId = "private";
-        if(message instanceof TextChannelMessage){
-            Category category = ((TextChannelMessage) message).getChannel().getParent();
-            assert category != null;
-            categoryId = category.getId();
+        if(!(message instanceof TextChannelMessage)){
+            message.reply(":x:team及其子指令只能在文字频道中使用！");
+            return;
         }
 
-        RolePojo bindRole = roleService.findBoundRole(categoryId, userId);
-        if(bindRole == null){
+        Category category = ((TextChannelMessage) message).getChannel().getParent();
+        assert category != null;
+
+        SanExpression expression = (SanExpression) arguments[0];
+
+        List<RolePojo> roles = roleService.findCategoryRoles(category.getId());
+        if(roles.isEmpty()){
             message.reply(":x:当前分组未绑定角色！");
             return;
         }
 
-        message.reply(diceService.sanCheck(bindRole, expression));
+        StringBuilder reply = new StringBuilder();
+
+        for(RolePojo role: roles){
+            reply.append(diceService.sanCheck(role, expression)).append("\n");
+        }
+
+        message.reply(reply.toString());
     }
 }

@@ -1,8 +1,10 @@
 package anokaze.kazedice.entity;
 
+import anokaze.kazedice.constants.Constants;
 import anokaze.kazedice.constants.SuccessLevel;
-import anokaze.kazedice.util.DiceUtil;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author AnoKaze
@@ -12,38 +14,60 @@ import lombok.Data;
 public class Assay {
     private String attributeName;
     private Integer attributeValue;
-    private Integer points;
-
-    public Assay(String attributeName, Integer attributeValue){
-        this.attributeName = attributeName;
-        this.attributeValue = attributeValue;
-        this.points = DiceUtil.rollDie(100);
-    }
+    private Byte type;
+    private List<Integer> tens;
+    private Integer point;
 
     public String getAssayString(){
-        return "进行了[" + attributeName + "]检定：" + getAssayLevel().toString() +
-                " D100 = " + points + " / " + attributeValue;
+        StringBuilder result = new StringBuilder();
+        result.append("进行了[").append(attributeName).append("]检定：")
+              .append(getAssayLevel().toString()).append(" D100 = ");
+
+        if(type.equals(Constants.ASSAY_NORMAL)){
+            result.append(point).append(" / ").append(attributeValue);
+        }
+        if(type.equals(Constants.ASSAY_BONUS)){
+            result.append(point).append("[奖励骰：");
+            for(int i = 0; i < tens.size(); i++){
+                if(i != 0){
+                    result.append(", ");
+                }
+                result.append(tens.get(i));
+            }
+            result.append("] / ").append(attributeValue);
+        }
+        if(type.equals(Constants.ASSAY_PUNISH)){
+            result.append(point).append("[惩罚骰：");
+            for(int i = 0; i < tens.size(); i++){
+                if(i != 0){
+                    result.append(", ");
+                }
+                result.append(tens.get(i));
+            }
+            result.append("] / ").append(attributeValue);
+        }
+        return result.toString();
     }
 
     public SuccessLevel getAssayLevel(){
         int critical = 5;
         int fumble = 96;
 
-        if(points <= critical) {
-            if(points <= attributeValue){ return SuccessLevel.CRITICAL; }
+        if(point <= critical) {
+            if(point <= attributeValue){ return SuccessLevel.CRITICAL; }
             else{ return SuccessLevel.FAIL; }
         }
-        if(points >= fumble) {
-            if(points > attributeValue){ return SuccessLevel.FUMBLE; }
+        if(point >= fumble) {
+            if(point > attributeValue){ return SuccessLevel.FUMBLE; }
             else { return SuccessLevel.REGULAR; }
         }
-        if(points <= attributeValue / 5){
+        if(point <= attributeValue / 5){
             return SuccessLevel.EXTREME;
         }
-        if(points <= attributeValue / 2){
+        if(point <= attributeValue / 2){
             return SuccessLevel.HARD;
         }
-        if(points <= attributeValue){
+        if(point <= attributeValue){
             return SuccessLevel.REGULAR;
         }
         return SuccessLevel.FAIL;

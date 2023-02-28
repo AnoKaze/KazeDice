@@ -2,7 +2,6 @@ package anokaze.kazedice.entity;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
-import org.bson.types.ObjectId;
 
 /**
  * @author AnoKaze

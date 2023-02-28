@@ -63,7 +63,8 @@ public class StateShowCommand implements UserCommandExecutor {
         CharacteristicEnum[] characteristics = CharacteristicEnum.values();
         for(CharacteristicEnum item: characteristics){
             String key = item.getName();
-            if("灵感".equals(key) || "知识".equals(key)) {
+            if(CharacteristicEnum.CHARACTERISTIC_IDEA.getName().equals(key) ||
+               CharacteristicEnum.CHARACTERISTIC_KNOW.getName().equals(key)) {
                 continue;
             }
             characteristic.append(key).append("：").append(role.getCharacteristics().get(key)).append("\t");

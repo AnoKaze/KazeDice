@@ -1,19 +1,12 @@
 package anokaze.kazedice.util;
 
-import anokaze.kazedice.constants.BotExceptionEnum;
-import anokaze.kazedice.constants.RegexConstant;
-import anokaze.kazedice.constants.SuccessLevel;
+import anokaze.kazedice.constants.Constants;
 import anokaze.kazedice.entity.Assay;
-import anokaze.kazedice.exception.BotException;
-import anokaze.kazedice.entity.DiceGroup;
-import anokaze.kazedice.entity.DiceExpression;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author AnoKaze
@@ -29,9 +22,7 @@ public class DiceUtil {
      * @return 投出结果
      */
     public static Integer rollDie(int faces){
-        if(faces < 0) {
-            return null;
-        } else if(faces == 0) {
+        if(faces <= 0) {
             return 0;
         } else {
             return SECURE_RANDOM.nextInt(faces) + 1;
@@ -52,59 +43,66 @@ public class DiceUtil {
         return result;
     }
 
-    /***
-     * 根据字符串获取骰子组对象
-     * @param diceGroup 骰子组的字符串形式
-     * @return 骰子表达式对象
-     */
-    public static DiceGroup diceGroupParser(String diceGroup){
-        Matcher matcher;
-        matcher = Pattern.compile(RegexConstant.NXX_DICE_REGEX) .matcher(diceGroup);
-        if(matcher.find()){
-            int n = Integer.parseInt(matcher.group(1));
-            return new DiceGroup(n, null, null);
+    public static Assay normalAssay(String attrName, Integer attrValue){
+        Assay assay = new Assay();
+
+        assay.setAttributeName(attrName);
+        assay.setAttributeValue(attrValue);
+        assay.setType(Constants.ASSAY_NORMAL);
+        assay.setPoint(DiceUtil.rollDie(100));
+
+        return assay;
+    }
+
+    public static Assay bonusAssay(String attrName, Integer attrValue, Integer bonus){
+        Assay assay = new Assay();
+
+        int one = rollDie(10) - 1;
+        List<Integer> tens = new ArrayList<>(bonus + 1);
+        for (int i = 0; i < bonus + 1; i++){
+            tens.add(rollDie(10) - 1);
         }
-        matcher = Pattern.compile(RegexConstant.NDX_DICE_REGEX).matcher(diceGroup);
-        if(matcher.find()){
-            int n = matcher.group(1) == null ? 1 : Integer.parseInt(matcher.group(1));
-            int d = Integer.parseInt(matcher.group(2));
-            return new DiceGroup(n,d,null);
-        }
-        matcher = Pattern.compile(RegexConstant.NDK_DICE_REGEX).matcher(diceGroup);
-        if(matcher.find()){
-            int n = Integer.parseInt(matcher.group(1));
-            int d = Integer.parseInt(matcher.group(2));
-            int k = Integer.parseInt(matcher.group(3));
-            if(Math.abs(n) < k){
-                throw new BotException(BotExceptionEnum.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
+
+        assay.setAttributeName(attrName);
+        assay.setAttributeValue(attrValue);
+        assay.setType(Constants.ASSAY_BONUS);
+        assay.setTens(tens);
+        int minPoint = 100;
+        for(Integer ten: tens){
+            int point = ten * 10 + one;
+            point = point == 0 ? 100 : point;
+            if(minPoint > point){
+                minPoint = point;
             }
-            return new DiceGroup(n,d,k);
         }
-        throw new BotException(BotExceptionEnum.DICE_GROUP_PARSE_EXCEPTION, diceGroup);
+        assay.setPoint(minPoint);
+
+        return assay;
     }
 
-    /***
-     * 根据字符串获取骰子表达式对象
-     * @param expression 骰子表达式的字符串形式
-     * @return 骰子表达式
-     */
-    public static DiceExpression diceExpressionParser(String expression){
-        List<String> operators = getOperators(expression);
-        String[] diceGroupStr = expression.split(RegexConstant.OPERATOR_REGEX);
-        List<DiceGroup> diceGroups = new ArrayList<>();
-        for(String item: diceGroupStr){
-            DiceGroup newGroup = diceGroupParser(item);
-            diceGroups.add(newGroup);
-        }
-        return new DiceExpression(operators, diceGroups);
-    }
+    public static Assay punishAssay(String attrName, Integer attrValue, Integer punish){
+        Assay assay = new Assay();
 
-    private static List<String> getOperators(String expression){
-        List<String> operators = new ArrayList<>();
-        Matcher m = Pattern.compile(RegexConstant.OPERATOR_REGEX).matcher(expression);
-        while(m.find()){
-            operators.add(m.group());
+        int one = rollDie(10) - 1;
+        List<Integer> tens = new ArrayList<>(punish + 1);
+        for (int i = 0; i < punish + 1; i++){
+            tens.add(rollDie(10) - 1);
         }
-        return operators;
+
+        assay.setAttributeName(attrName);
+        assay.setAttributeValue(attrValue);
+        assay.setType(Constants.ASSAY_PUNISH);
+        assay.setTens(tens);
+        int maxPoint = 0;
+        for(Integer ten: tens){
+            int point = ten * 10 + one;
+            point = point == 0 ? 100 : point;
+            if(maxPoint < point){
+                maxPoint = point;
+            }
+        }
+        assay.setPoint(maxPoint);
+
+        return assay;
     }
 }

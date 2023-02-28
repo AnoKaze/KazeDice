@@ -14,9 +14,9 @@ import snw.jkook.message.TextChannelMessage;
 
 /**
  * @author AnoKaze
- * @since 2023/2/15
+ * @since 2023/2/24
  */
-public class RollAssayCommand implements UserCommandExecutor {
+public class RollBonusCommand implements UserCommandExecutor {
     @Override
     public void onCommand(User user, Object[] arguments, Message message) {
         RoleService roleService = KazeDicePlugin.getServiceManager().getRoleService();
@@ -29,8 +29,9 @@ public class RollAssayCommand implements UserCommandExecutor {
             categoryId = category.getId();
         }
 
-        String attributeName = (String) arguments[0];
-        Integer attributeValue = (Integer) arguments[1];
+        Integer bonus = (Integer) arguments[0];
+        String attributeName = (String) arguments[1];
+        Integer attributeValue = (Integer) arguments[2];
 
         StringBuilder reply = new StringBuilder();
         RolePojo bindRole = null;
@@ -45,7 +46,7 @@ public class RollAssayCommand implements UserCommandExecutor {
             }
         }
 
-        Assay assay = DiceUtil.normalAssay(attributeName, attributeValue);
+        Assay assay = DiceUtil.bonusAssay(attributeName, attributeValue, bonus);
         if(bindRole != null && assay.getAssayLevel().compareTo(SuccessLevel.REGULAR) <= 0){
             bindRole.addBonus(attributeName);
             roleService.updateRole(bindRole);

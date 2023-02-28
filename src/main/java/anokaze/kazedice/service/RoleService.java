@@ -1,122 +1,79 @@
 package anokaze.kazedice.service;
-
-import anokaze.kazedice.entity.RoleBindPojo;
 import anokaze.kazedice.entity.RolePojo;
-import anokaze.kazedice.mapper.RoleBindMapper;
-import anokaze.kazedice.mapper.RoleMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author AnoKaze
- * @since 2023/2/11
+ * @since 2023/2/23
  */
-public class RoleService {
-    private final RoleMapper roleMapper;
-    private final RoleBindMapper roleBindMapper;
+ public interface RoleService {
+    /**
+     * 向数据库中插入角色
+     * @param role 角色对象
+     */
+    void insertRole(RolePojo role);
 
-    public RoleService(RoleMapper roleMapper, RoleBindMapper roleBindMapper){
-        this.roleMapper = roleMapper;
-        this.roleBindMapper = roleBindMapper;
-    }
+    /**
+     * 将角色与分组绑定
+     * @param role 角色对象
+     * @param categoryId 绑定的分组id
+     */
+    void bindRoleToCategory(RolePojo role, String categoryId);
 
-    public void insertRole(RolePojo role){
-        roleMapper.insertRole(role);
-    }
+    /**
+     * 将角色与分组解绑
+     * @param role 角色对象
+     * @param categoryId 解绑的分组id
+     */
+    void unbindRoleFromCategory(RolePojo role, String categoryId);
 
-    public void bindRoleToCategory(RolePojo role, String categoryId){
-        RoleBindPojo query = new RoleBindPojo();
-        query.setCategoryId(categoryId);
-        query.setUserId(role.getUserId());
-        RoleBindPojo exist = roleBindMapper.findRoleBind(query);
-        if(exist != null){
-            roleBindMapper.deleteRoleBind(exist.getId());
-        }
-        RoleBindPojo roleBind = new RoleBindPojo(categoryId, role.getUserId(), role.getId());
-        roleBindMapper.insertRoleBind(roleBind);
-    }
+    /**
+     * 从数据库中删除角色
+     * @param roleId 角色id
+     */
+     void deleteRole(String roleId);
 
-    public void unbindRoleFromCategory(RolePojo role, String categoryId){
-        RoleBindPojo query = new RoleBindPojo();
-        query.setCategoryId(categoryId);
-        query.setUserId(role.getUserId());
-        query.setRoleId(role.getId());
-        RoleBindPojo exist = roleBindMapper.findRoleBind(query);
+    /**
+     * 更新数据库中的角色信息
+     * @param role 角色对象
+     */
+     void updateRole(RolePojo role);
 
-        if(exist != null) {
-            roleBindMapper.deleteRoleBind(exist.getId());
-        }
-    }
+    /**
+     * 根据角色id获取角色对象
+     * @param id 角色id
+     * @return 角色对象，未查到时为null
+     */
+     RolePojo findRoleById(String id);
 
-    public void deleteRole(String roleId){
-        roleMapper.deleteRole(roleId);
+    /**
+     * 根据用户和角色名获取角色对象
+     * @param userId 用户id
+     * @param name 角色名
+     * @return 角色对象，未查到时为null
+     */
+     RolePojo findRoleByName(String userId, String name);
 
-        RoleBindPojo query = new RoleBindPojo();
-        query.setRoleId(roleId);
-        RoleBindPojo roleBind = roleBindMapper.findRoleBind(query);
-        if(roleBind != null){
-            roleBindMapper.deleteRoleBind(roleBind.getId());
-        }
-    }
+    /**
+     * 获取一名用户的所有角色
+     * @param userId 用户id
+     * @return 角色对象列表
+     */
+     List<RolePojo> findUserRoles(String userId);
 
-    public void updateRole(RolePojo role){
-        roleMapper.updateRole(role);
-    }
+    /**
+     * 获取用户与某一分组绑定的角色
+     * @param categoryId 分组id
+     * @param userId 用户id
+     * @return 绑定的角色
+     */
+     RolePojo findBoundRole(String categoryId, String userId);
 
-    public RolePojo findRoleById(String id){
-        RolePojo query = new RolePojo();
-        query.setId(id);
-        return roleMapper.findRole(query);
-    }
-
-    public RolePojo findRoleByName(String userId, String name){
-        RolePojo query = new RolePojo();
-        query.setUserId(userId);
-        query.setName(name);
-        return roleMapper.findRole(query);
-    }
-
-    public List<RolePojo> findUserRoles(String userId){
-        RolePojo query = new RolePojo();
-        query.setUserId(userId);
-        return roleMapper.findRoles(query);
-    }
-
-    public RolePojo findBoundRole(String categoryId, String userId){
-        RoleBindPojo query1 = new RoleBindPojo();
-        query1.setCategoryId(categoryId);
-        query1.setUserId(userId);
-        RoleBindPojo roleBind = roleBindMapper.findRoleBind(query1);
-        if(roleBind == null){ return null; }
-
-        RolePojo query2 = new RolePojo();
-        query2.setId(roleBind.getRoleId());
-        return roleMapper.findRole(query2);
-    }
-
-    public List<RolePojo> findCategoryRoles(String categoryId){
-        RoleBindPojo query = new RoleBindPojo();
-        query.setCategoryId(categoryId);
-        List<RoleBindPojo> binds = roleBindMapper.findRoleBinds(query);
-
-        List<RolePojo> result = new ArrayList<>(binds.size());
-        for(RoleBindPojo bind: binds){
-            RolePojo query0 = new RolePojo();
-            query.setUserId(bind.getUserId());
-            RolePojo role = roleMapper.findRole(query0);
-
-            if(role != null){
-                result.add(role);
-            }
-        }
-
-        return result;
-    }
-
-    public RoleBindPojo findBindByRole(String roleId){
-        RoleBindPojo query = new RoleBindPojo();
-        query.setRoleId(roleId);
-        return roleBindMapper.findRoleBind(query);
-    }
+    /**
+     * 获取某一分组内所有绑定的角色
+     * @param categoryId 分组id
+     * @return 绑定的角色列表
+     */
+     List<RolePojo> findCategoryRoles(String categoryId);
 }

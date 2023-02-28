@@ -1,12 +1,12 @@
 package anokaze.kazedice.command;
 
 import anokaze.kazedice.KazeDicePlugin;
-import anokaze.kazedice.constants.CharacteristicEnum;
 import anokaze.kazedice.constants.SuccessLevel;
 import anokaze.kazedice.entity.Assay;
 import anokaze.kazedice.entity.RavRecord;
 import anokaze.kazedice.entity.RolePojo;
 import anokaze.kazedice.service.RoleService;
+import anokaze.kazedice.util.DiceUtil;
 import snw.jkook.command.UserCommandExecutor;
 import snw.jkook.entity.User;
 import snw.jkook.entity.channel.Category;
@@ -53,9 +53,10 @@ public class RollAssayVersusCommand implements UserCommandExecutor {
             }
         }
 
-        Assay assay = new Assay(attributeName, attributeValue);
+        Assay assay = DiceUtil.normalAssay(attributeName, attributeValue);
         if(bindRole != null && assay.getAssayLevel().compareTo(SuccessLevel.REGULAR) <= 0){
             bindRole.addBonus(attributeName);
+            roleService.updateRole(bindRole);
         }
 
         RavRecord record = RECORDS.get(categoryId);
@@ -63,6 +64,7 @@ public class RollAssayVersusCommand implements UserCommandExecutor {
             reply.append("发起了一次对抗：\n").append(assay.getAssayString());
             record = new RavRecord();
             record.setOffensive(assay);
+            RECORDS.put(categoryId, record);
             message.reply(reply.toString());
         }
         else {

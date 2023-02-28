@@ -1,13 +1,11 @@
 package anokaze.kazedice.command;
 
 import anokaze.kazedice.KazeDicePlugin;
-import anokaze.kazedice.entity.RoleBindPojo;
 import anokaze.kazedice.entity.RolePojo;
 import anokaze.kazedice.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
 import snw.jkook.command.UserCommandExecutor;
 import snw.jkook.entity.User;
-import snw.jkook.entity.channel.Category;
 import snw.jkook.message.Message;
 
 /**

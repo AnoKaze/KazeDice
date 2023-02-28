@@ -8,14 +8,16 @@ import lombok.Getter;
  * @since 2023/02/02
  */
 @Getter
-public enum BotExceptionEnum {
+public enum ResultCodeEnum {
+    // 成功处理
+    SUCCESS("00000", "success"),
     // 骰子组打印错误
-    DICE_GROUP_PARSE_EXCEPTION("0001", "Parse DiceGroup error");
+    DICE_GROUP_PARSE_ERROR("10001", "打印骰子组错误");
 
     private final String code;
     private final String message;
 
-    BotExceptionEnum(String code, String message){
+    ResultCodeEnum(String code, String message){
         this.code = code;
         this.message = message;
     }

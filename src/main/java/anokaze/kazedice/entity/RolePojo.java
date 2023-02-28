@@ -1,14 +1,12 @@
 package anokaze.kazedice.entity;
 
 import anokaze.kazedice.constants.CharacteristicEnum;
+import anokaze.kazedice.constants.DamageBonusEnum;
 import anokaze.kazedice.constants.SkillEnum;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author AnoKaze
@@ -61,8 +59,22 @@ public class RolePojo {
         return 0;
     }
 
+    public String getDamageBonus(){
+        Integer con = characteristics.get(CharacteristicEnum.CHARACTERISTIC_CON.getName());
+        Integer siz = characteristics.get(CharacteristicEnum.CHARACTERISTIC_SIZ.getName());
+
+        DamageBonusEnum[] dbs = DamageBonusEnum.values();
+        for(DamageBonusEnum db: dbs){
+            if(con + siz < db.getThreshold()){
+                return db.getValue();
+            }
+        }
+        return DamageBonusEnum.TIER_6.getValue();
+    }
+
     public void addBonus(String name){
-        if(skills.containsKey(name)){
+        if(skills.containsKey(name) && !name.equals(SkillEnum.SKILL_CTHULHU_MYTHOS.getName())
+                && !name.equals(SkillEnum.SKILL_CREDIT_RATING.getName())){
             bonus.add(name);
         }
     }

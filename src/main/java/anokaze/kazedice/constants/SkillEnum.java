@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 public enum SkillEnum {
-    // 技能
+    // 技能枚举
     SKILL_ACCOUNTING("会计", 5),
     SKILL_ANTHROPOLOGY("人类学", 1),
     SKILL_APPRAISE("估价", 5),
@@ -19,7 +19,7 @@ public enum SkillEnum {
     SKILL_CREDIT_RATING("信用评级", 0),
     SKILL_CTHULHU_MYTHOS("克苏鲁神话", 0),
     SKILL_DISGUISE("乔装", 5),
-    // SKILL_DODGE("闪避", 0),
+    SKILL_DODGE("闪避", 0),
     SKILL_DRIVE_AUTO("汽车驾驶", 20),
     SKILL_ELECTRICAL_REPAIR("电气维修", 10),
     SKILL_ELECTRONICS("电子学", 1),
@@ -30,7 +30,7 @@ public enum SkillEnum {
     SKILL_HISTORY("历史", 5),
     SKILL_INTIMIDATE("恐吓", 15),
     SKILL_JUMP("跳跃", 20),
-    // SKILL_LANGUAGE("母语", 0),
+    SKILL_LANGUAGE("母语", 0),
     SKILL_LAW("法律", 5),
     SKILL_LIBRARY_USE("图书馆使用", 20),
     SKILL_LISTEN("聆听", 20),
